@@ -13,23 +13,23 @@ namespace comandos.logic
     public static class UserOperations
     {
 
-        public static short Login(string usr, string con)
+        public static int[] Login(string usr, string con)
         {
             using (var context = new ProtrackContext())
             {
                 try
                 {
-                    short? loginQuery = (from ua in context.UsuarioAplicacion
+                    var loginQuery = (from ua in context.UsuarioAplicacion
                                          join aua in context.AccesoUsuarioAplicacion on ua.ua_id equals aua.ua_id
                                          where ua.ua_usr == usr && ua.ua_con == con && aua.ap_id == 33
-                                         select aua.aua_perfil).FirstOrDefault();
-                    if (loginQuery != null) return (short)loginQuery;
-                    else return -1;
+                                         select new { aua.aua_perfil, ua.ua_id }).FirstOrDefault();
+                    if (loginQuery != null) return new int[] { (int)loginQuery.aua_perfil, loginQuery.ua_id};
+                    else return new int[] { -1, 0 };
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex);
-                    return -2;
+                    return new int[] { -2, 0 };
                 }
             }
         }
