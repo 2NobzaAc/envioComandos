@@ -1,12 +1,12 @@
 ﻿using comandos.data.model;
-using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using System.Data.Entity;
 
 namespace comandos.data
 {
-    public class ProtrackContext : DbContext
+    public class BackupContext : DbContext
     {
-        public ProtrackContext() : base("name=ProtrackEntities")
+        public BackupContext() : base("name=Backup")
         {
             Database.SetInitializer<ProtrackContext>(null);
         }
@@ -18,11 +18,6 @@ namespace comandos.data
 
             base.OnModelCreating(modelBuilder);
         }
-        public DbSet<AccesoUsuarioAplicacion> AccesoUsuarioAplicacion { get; set; }
-        public DbSet<UsuarioAplicacion> UsuarioAplicacion { get; set; }
-        public DbSet<Comando> Comando { get; set; }
         public DbSet<LogDatos> LogDatos { get; set; }
-        public DbSet<Perfil> Perfil { get; set; }
-        public DbSet<Unidad> Unidad { get; set; }
     }
 }
