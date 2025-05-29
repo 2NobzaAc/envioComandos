@@ -1,12 +1,7 @@
 ﻿using comandos.data;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace comandos.logic
 {
@@ -21,7 +16,7 @@ namespace comandos.logic
                 {
                     var loginQuery = (from ua in context.UsuarioAplicacion
                                          join aua in context.AccesoUsuarioAplicacion on ua.ua_id equals aua.ua_id
-                                         where ua.ua_usr == usr && ua.ua_con == con && aua.ap_id == 33
+                                         where ua.ua_usr == usr && ua.ua_con == con && aua.ap_id == 33 && ua.ua_fechafin == null && aua.aua_fechafin == null
                                          select new { aua.aua_perfil, ua.ua_id }).FirstOrDefault();
                     if (loginQuery != null) return new int[] { (int)loginQuery.aua_perfil, loginQuery.ua_id};
                     else return new int[] { -1, 0 };
