@@ -10,6 +10,8 @@ namespace comandos.logic
     {
         public static int SendCommand(int ua_id, string cm_unidad, string cm_comando)
         {
+            if (cm_unidad == null || cm_unidad.Trim() == "") return -3;
+            if (cm_comando == null || cm_comando.Trim() == "") return -4;
             string normalizedunit = cm_unidad.ToUpper().Trim();
             string normalizedCommand = cm_comando.ToUpper().Trim();
             using (var context = new ProtrackContext())

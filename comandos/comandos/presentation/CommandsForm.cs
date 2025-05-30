@@ -51,7 +51,9 @@ namespace comandos.presentation
         {
             int cm_id = CommandOperations.SendCommand(this.ua_id, textBox1.Text, textBox2.Text);
 
-            if (cm_id == -2) MessageBox.Show("Errores de red, por favor intente más tarde");
+            if (cm_id == -4) MessageBox.Show("Escriba un comando para insertar");
+            else if (cm_id == -3) MessageBox.Show("Escriba la unidad para insertar comando");
+            else if (cm_id == -2) MessageBox.Show("Errores de red, por favor intente más tarde");
             else if (cm_id == -1) MessageBox.Show("La unidad insertada es inválida");
             else if (cm_id == 0) MessageBox.Show("El usuario ingresado es inválido.");
             else MessageBox.Show("Commando insertado con código de transacción: " + cm_id);
