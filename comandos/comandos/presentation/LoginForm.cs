@@ -1,9 +1,6 @@
-﻿using comandos.data;
-using comandos.logic;
+﻿using comandos.logic;
 using comandos.presentation;
 using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace comandos
