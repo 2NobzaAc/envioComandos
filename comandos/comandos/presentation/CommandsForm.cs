@@ -2,19 +2,48 @@
 using System;
 using System.Windows.Forms;
 using System.Configuration;
+using comandos.data.templates;
+using System.Collections.Generic;
 
 namespace comandos.presentation
 {
     public partial class CommandsForm : Form
     {
-        int per_id;
-        int ua_id;
+        private int per_id;
+        private int ua_id;
+        private List<int> loadedIDs = new List<int>();
+        private List<CommandEntry> loadedCommands = new List<CommandEntry>();
+        private TextBox[] unitRefs;
+        private TextBox[] commandRefs;
+        private int cursor;
         public CommandsForm(int per_id, int ua_id)
         {
             InitializeComponent();
             this.ua_id = ua_id;
             this.per_id = per_id;
+            this.unitRefs = new TextBox[] { textBox1, textBox4, textBox6, textBox8, textBox10, textBox12 };
+            this.commandRefs = new TextBox[] { textBox2, textBox3, textBox5, textBox7, textBox9, textBox11 };
+            this.cursor = 0;
             HideButtons();
+            dataGridView1.AutoGenerateColumns = false;
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                DataPropertyName = "cm_unidad",
+                HeaderText = "Unidad",
+                Width = 200
+            });
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                DataPropertyName = "cm_comando",
+                HeaderText = "Comando",
+                Width = 240
+            });
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                DataPropertyName = "cm_enviado",
+                HeaderText = "Estado",
+                Width = 120
+            });
         }
 
         private void Logout()
@@ -32,31 +61,39 @@ namespace comandos.presentation
             this.Close();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void refreshLoadedCommands()
         {
-            Logout();
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            ToLogs();
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
+            loadedCommands = CommandOperations.GetSentCommands(loadedIDs);
+            dataGridView1.DataSource = loadedCommands;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int cm_id = CommandOperations.SendCommand(this.ua_id, textBox1.Text, textBox2.Text);
+            string finalResponse = "";
+            for(int i = 0; i < this.unitRefs.Length; i++)
+            {
+                string unitText = this.unitRefs[i].Text.Trim();
+                string commandText = this.commandRefs[i].Text.Trim();
+                if (unitText != null && commandText != null && unitText != "" && commandText != "") {
+                    int cm_id = CommandOperations.SendCommand(this.ua_id, unitText, commandText);
 
-            if (cm_id == -4) MessageBox.Show("Escriba un comando para insertar");
-            else if (cm_id == -3) MessageBox.Show("Escriba la unidad para insertar comando");
-            else if (cm_id == -2) MessageBox.Show("Errores de red, por favor intente más tarde");
-            else if (cm_id == -1) MessageBox.Show("La unidad insertada es inválida");
-            else if (cm_id == 0) MessageBox.Show("El usuario ingresado es inválido.");
-            else MessageBox.Show("Commando insertado con código de transacción: " + cm_id);
+                    if (cm_id == -2) finalResponse += String.Format("Comando {0} fallido: Errores de red, por favor intente más tarde.{1}", i + 1, Environment.NewLine);
+                    else if (cm_id == -1) finalResponse += String.Format("Comando {0} fallido: La unidad insertada es inválida.{1}", i + 1, Environment.NewLine);
+                    else if (cm_id == 0)
+                    {
+                        MessageBox.Show("El usuario ingresado es inválido.");
+                        return;
+                    }
+                    else
+                    {
+                        loadedIDs.Add(cm_id);
+                        finalResponse += String.Format("Comando {0} insertado con código de transacción: {1}.{2}", i + 1, cm_id, Environment.NewLine);
+                    }
+                }
+                
+            }
+            refreshLoadedCommands();
+            MessageBox.Show(finalResponse);
         }
 
         private bool[] GetBitsArray(int number)
@@ -108,12 +145,13 @@ namespace comandos.presentation
             removeButton3.Visible = false;
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void HandleUnitTextChange(string un_unidadid)
         {
-            if(textBox1.Text.Length > 0)
+            if (un_unidadid.Length > 0)
             {
-                char firstCharacter = textBox1.Text.ToCharArray()[0];
-                switch (firstCharacter) {
+                char firstCharacter = un_unidadid.ToCharArray()[0];
+                switch (firstCharacter)
+                {
                     case '0':
                         SwitchButtons(226);
                         break;
@@ -140,64 +178,160 @@ namespace comandos.presentation
             }
         }
 
+        private void WriteButtonCommand(string command)
+        {
+            this.commandRefs[this.cursor].Text = ConfigurationManager.AppSettings[command];
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Logout();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ToLogs();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            HandleUnitTextChange(textBox1.Text);
+            this.cursor = 0;
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            HandleUnitTextChange(textBox4.Text);
+            this.cursor = 1;
+        }
+
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+            HandleUnitTextChange(textBox6.Text);
+            this.cursor = 2;
+        }
+
+        private void textBox8_TextChanged(object sender, EventArgs e)
+        {
+            HandleUnitTextChange(textBox8.Text);
+            this.cursor = 3;
+        }
+
+        private void textBox10_TextChanged(object sender, EventArgs e)
+        {
+            HandleUnitTextChange(textBox10.Text);
+            this.cursor = 4;
+        }
+
+        private void textBox12_TextChanged(object sender, EventArgs e)
+        {
+            HandleUnitTextChange(textBox12.Text);
+            this.cursor = 5;
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            this.cursor = 0;
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            this.cursor = 1;
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            this.cursor = 2;
+        }
+
+        private void textBox7_TextChanged(object sender, EventArgs e)
+        {
+            this.cursor = 3;
+        }
+
+        private void textBox9_TextChanged(object sender, EventArgs e)
+        {
+            this.cursor = 4;
+        }
+
+        private void textBox11_TextChanged(object sender, EventArgs e)
+        {
+            this.cursor = 5;
+        }
+
         private void sensorButton_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["sensormov"];
+            WriteButtonCommand("sensormov");
         }
 
         private void calibrationButton_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["calibracion"];
+            WriteButtonCommand("calibracion");
         }
 
         private void warningButton_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["alerta"];
+            WriteButtonCommand("alerta");
         }
 
         private void guayaButton1_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["guaya1"];
+            WriteButtonCommand("guaya1");
         }
 
         private void guayaButton2_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["guaya2"];
+            WriteButtonCommand("guaya2");
         }
 
         private void guayaButton3_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["guaya12"];
+            WriteButtonCommand("guaya12");
         }
 
         private void cutButton1_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["corte1"];
+            WriteButtonCommand("corte1");
         }
 
         private void cutButton2_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["corte2"];
+            WriteButtonCommand("corte2");
         }
 
         private void cutButton3_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["corte3"];
+            WriteButtonCommand("corte3");
         }
 
         private void removeButton1_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["remocion1"];
+            WriteButtonCommand("remocion1");
         }
 
         private void removeButton2_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["remocion2"];
+            WriteButtonCommand("remocion2");
         }
 
         private void removeButton3_Click(object sender, EventArgs e)
         {
-            textBox2.Text = ConfigurationManager.AppSettings["remocion12"];
+            WriteButtonCommand("remocion12");
         }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            refreshLoadedCommands();
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }

@@ -1,6 +1,8 @@
 ﻿using comandos.data;
 using comandos.data.model;
+using comandos.data.templates;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -43,6 +45,36 @@ namespace comandos.logic
                 {
                     Debug.WriteLine(ex);
                     return -2; //error de red
+                }
+            }
+        }
+        public static List<CommandEntry> GetSentCommands(List<int> sent)
+        {
+            List < CommandEntry > fetched = new List<CommandEntry>();
+            if (sent.Count == 0) return fetched;
+            
+            using (var context = new ProtrackContext())
+            {
+                try
+                {
+                    var queriedCommands = context.Comando.Where(cm => sent.Contains(cm.cm_id)).Select(cm => new
+                    {
+                        cm.cm_comando,
+                        cm.cm_unidad,
+                        cm.cm_enviado
+                    });
+
+                    foreach (var command in queriedCommands)
+                    {
+                        fetched.Add(new CommandEntry(command.cm_unidad, command.cm_comando, (byte) command.cm_enviado));
+                    }
+
+                    return fetched;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    return fetched; ; //error de red
                 }
             }
         }

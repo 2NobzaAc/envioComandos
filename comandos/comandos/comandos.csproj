@@ -27,7 +27,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <AutorunEnabled>true</AutorunEnabled>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -100,6 +100,7 @@
     <Compile Include="data\model\Unidad.cs" />
     <Compile Include="data\model\UsuarioAplicacion.cs" />
     <Compile Include="data\ProtrackContext.cs" />
+    <Compile Include="data\templates\CommandEntry.cs" />
     <Compile Include="data\templates\LogResult.cs" />
     <Compile Include="logic\CommandOperations.cs" />
     <Compile Include="logic\LogsOperations.cs" />
